@@ -12,13 +12,14 @@ export class GameMap extends GameObject {
         this.rows = 19;
         this.cols = 18;
 
-        this.inner_walls_count = 100;
+        this.inner_walls_count = 70;
         this.walls = [];
 
         this.snakes = [
             new Snake({id: 0, color: "#09117B", r: this.rows - 2, c: 1}, this),
             new Snake({id: 1, color: "#9D0C15", r: 1, c: this.cols - 2}, this),
         ];
+    
     }
     //检测出生点之间有没有一条通路（Flood Fill洪水覆盖算法）
     check_connectivity(g, sx, sy, tx, ty){
@@ -133,7 +134,7 @@ export class GameMap extends GameObject {
                 k --;
             }
             for (let i = 0; i < k; i++){
-                if (snake.cells[i].r === cell.r && snake.cells[i].c ===cell.c)
+                if (snake.cells[i].r === cell.r && snake.cells[i].c === cell.c)
                     return false;
             }
         }
