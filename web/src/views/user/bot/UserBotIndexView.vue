@@ -11,7 +11,7 @@
             <div class="col-9">
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header">
-                        <span style="height: 300px; font-size: large"> 我的Bot </span>
+                        <span style="font-size: 140%"> 我的Bot </span>
                         <botton type="button" class="btn btn-primary float-end" data-bs-toggle='modal' data-bs-target="#add-bot-btn">
                             创建Bot
                         </botton>
