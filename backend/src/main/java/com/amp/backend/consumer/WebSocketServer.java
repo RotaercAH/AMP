@@ -4,6 +4,7 @@ package com.amp.backend.consumer;
 import com.alibaba.fastjson2.JSONObject;
 import com.amp.backend.consumer.utils.Game;
 import com.amp.backend.consumer.utils.JwtAuthentication;
+import com.amp.backend.mapper.RecordMapper;
 import com.amp.backend.mapper.UserMapper;
 import com.amp.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +16,31 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
     public static final ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
-    private static final CopyOnWriteArrayList<User> matchpool = new CopyOnWriteArrayList<>();
+    private static final CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
     private User user;
     private Session session = null;
 
     private static UserMapper userMapper;
+    public static RecordMapper recordMapper;
     private Game game = null;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         WebSocketServer.userMapper = userMapper;
     }
+
+    @Autowired
+    public void setRecordMapper(RecordMapper recordMapper) {
+        WebSocketServer.recordMapper = recordMapper;
+    }
+
 
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
@@ -48,7 +56,7 @@ public class WebSocketServer {
             this.session.close();
         }
 
-        users.put(userId, this);
+        System.out.println(users);
     }
 
     @OnClose
@@ -78,11 +86,12 @@ public class WebSocketServer {
             matchpool.remove(b);
 
             Game game = new Game(19, 18, 70, a.getId(), b.getId());
-            game.creatMap();
-            game.start();
+            game.createMap();
 
             users.get(a.getId()).game = game;
             users.get(b.getId()).game = game;
+
+            game.start();
 
             JSONObject respGame = new JSONObject();
             respGame.put("a_id", game.getPlayerA().getId());
@@ -97,7 +106,6 @@ public class WebSocketServer {
             respA.put("event", "start-matching");
             respA.put("opponent_username", b.getUsername());
             respA.put("opponent_photo", b.getPhoto());
-            respA.put("gamemap", game.getG());
             respA.put("game", respGame);
             users.get(a.getId()).sendMessage(respA.toJSONString());
 
@@ -105,7 +113,6 @@ public class WebSocketServer {
             respB.put("event", "start-matching");
             respB.put("opponent_username", a.getUsername());
             respB.put("opponent_photo", a.getPhoto());
-            respB.put("gamemap", game.getG());
             respB.put("game", respGame);
             users.get(b.getId()).sendMessage(respB.toJSONString());
         }

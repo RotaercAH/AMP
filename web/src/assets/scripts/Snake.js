@@ -66,10 +66,6 @@ export class Snake extends GameObject{
         for(let i = k; i > 0; i --){
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
-
-        if(!this.gamemap.check_valid(this.next_cell)) { //如果下一步操作发生碰撞，蛇死亡
-            this.status = "die";
-        }
     }
 
     update_move() {  
