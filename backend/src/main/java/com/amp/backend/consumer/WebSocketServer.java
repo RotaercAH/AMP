@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
-    private static final ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
     private static final CopyOnWriteArrayList<User> matchpool = new CopyOnWriteArrayList<>();
     private User user;
     private Session session = null;
@@ -111,6 +111,13 @@ public class WebSocketServer {
         }
     }
 
+    private void move(int direction){
+        if(game.getPlayerA().getId().equals(user.getId())){
+            game.setNextStepA(direction);
+        } else if (game.getPlayerB().getId().equals(user.getId())) {
+            game.setNextStepB(direction);
+        }
+    }
 
     @OnMessage
     public void onMessage(String message, Session session) { // 当作路由，判断前端发送来的请求应该交给后端谁来处理
@@ -121,6 +128,8 @@ public class WebSocketServer {
             startMatching();
         } else if ("stop-matching".equals(event)) {
             stopMatching();
+        } else if("move".equals(event)) {
+            move(data.getInteger("direction"));
         }
         // 从Client接收消息
     }

@@ -1,7 +1,11 @@
 package com.amp.backend.consumer.utils;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.amp.backend.consumer.WebSocketServer;
+
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Game extends Thread{
     private final Integer rows;
@@ -11,6 +15,12 @@ public class Game extends Thread{
     final private static int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
 
     private final Player playerA, playerB;
+    private Integer nextStepA = null;
+    private Integer nextStepB = null;
+    private ReentrantLock lock = new ReentrantLock();
+    private String status = "playing";
+    private String loser = ""; // all : 平局, A : A输， B : B输
+
     public Game(Integer rows, Integer cols, Integer inner_walls_count, Integer idA, Integer idB) {
         this.rows = rows;
         this.cols = cols;
@@ -26,6 +36,26 @@ public class Game extends Thread{
 
     public Player getPlayerB() {
         return playerB;
+    }
+
+    public void setNextStepA(Integer nextStepA){
+        lock.lock();
+        try {
+            this.nextStepA = nextStepA;
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    public void setNextStepB(Integer nextStepB) {
+        lock.lock();
+        try {
+            this.nextStepB = nextStepB;
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     public int[][] getG(){
@@ -89,8 +119,90 @@ public class Game extends Thread{
         }
     }
 
+    private boolean nextStep() { //等待两名玩家的下一步操作
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        for(int i = 0; i < 5; i++){
+            try {
+                lock.lock();
+                Thread.sleep(1000);
+                try {
+                    if(nextStepA != null && nextStepB != null){
+                        playerA.getSteps().add(nextStepA);
+                        playerB.getSteps().add(nextStepB);
+                        return true;
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private void sendMove() { // 将双方的操作发送给玩家
+        lock.lock();
+        try {
+            JSONObject resp = new JSONObject();
+            resp.put("event", "move");
+            resp.put("a_direction", nextStepA);
+            resp.put("b_direction", nextStepB);
+            nextStepA = nextStepB = null;
+            sendAllMessage(resp.toJSONString());
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void sendAllMessage(String message) {
+        WebSocketServer.users.get(playerA.getId()).sendMessage(message);
+        WebSocketServer.users.get(playerB.getId()).sendMessage(message);
+    }
+
+    private void judge() { // 判断两条蛇的胜负
+
+    }
+
+    private void sendResult() { //向两名玩家返回游戏结果
+        JSONObject resp = new JSONObject();
+        resp.put("event", "result");
+        resp.put("loser", loser);
+        sendAllMessage(resp.toJSONString());
+    }
+
     @Override
     public void run(){
-        
+        for(int i = 0; i < 2000; i++){
+            if(nextStep()){
+                judge();
+                if(status.equals("playing")){
+                    sendMove();
+                } else {
+                    sendResult();
+                    break;
+                }
+            } else {
+                status = "finished";
+                lock.lock();
+                try {
+                    if(nextStepA == null && nextStepB == null){
+                        loser = "all";
+                    } else if (nextStepA == null) {
+                        loser = "A";
+                    } else {
+                        loser = "B";
+                    }
+                } finally {
+                    lock.unlock();
+                }
+
+            }
+        }
+        sendResult();
     }
 }
