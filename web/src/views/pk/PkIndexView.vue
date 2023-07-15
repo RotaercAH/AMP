@@ -2,6 +2,8 @@
     <PlayGround v-if="$store.state.pk.status === 'playing'"/>
     <MatchGround v-if="$store.state.pk.status === 'matching'"/>
     <ResultBoard v-if="$store.state.pk.loser != 'none'"/>
+    <div class="user-color" v-if="$store.state.pk.status === 'playing' && parseInt($store.state.user.id) === parseInt($store.state.pk.a_id)">您的出生点在左下角</div>
+    <div class="user-color" v-if="$store.state.pk.status === 'playing' && parseInt($store.state.user.id) === parseInt($store.state.pk.b_id)">您的出生点在右上角</div>
 </template>
 
 <script>
@@ -21,7 +23,7 @@ export default {
 
     setup() {
         const store = useStore();
-        const socketUrl = `ws://127.0.0.1:8080/websocket/${store.state.user.token}/`;
+        const socketUrl = `wss://app5706.acapp.acwing.com.cn/websocket/${store.state.user.token}/`;
 
         store.commit("updateLoser", "none");
         store.commit("updateIsRecord", false);
@@ -30,7 +32,7 @@ export default {
         onMounted(() => {
             store.commit("updateOpponent", {
                 username: "我的对手",
-                photo: "https://img0.baidu.com/it/u=3491863486,2489088886&fm=253&fmt=auto&app=138&f=JPEG?w=311&h=500"
+                photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png"
             })
             socket = new WebSocket(socketUrl);
 
@@ -83,3 +85,13 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+div.user-color{
+    text-align: center;
+    color: wheat;
+    font-size: 40px;
+    font-weight: 600;
+}
+
+</style>
