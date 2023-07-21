@@ -78,7 +78,7 @@ export default {
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/ranklist/getlist/",
+                url: "https://rotaerc.cn/api/ranklist/getlist/",
                 data: {
                     page,
                 },

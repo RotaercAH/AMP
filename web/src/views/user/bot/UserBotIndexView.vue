@@ -161,7 +161,7 @@ export default {
 
         const refresh_bots = () => {
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/user/bot/getlist/",
+                url: "https://rotaerc.cn/api/user/bot/getlist/",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + store.state.user.token,
@@ -180,7 +180,7 @@ export default {
         const add_bot = () => {
             botadd.error_message = "";
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/user/bot/add/",
+                url: "https://rotaerc.cn/api/user/bot/add/",
                 type: "POST",
                 data:{
                     title: botadd.title,
@@ -206,7 +206,7 @@ export default {
 
         const remove_bot = (bot) => {
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/user/bot/remove/",
+                url: "https://rotaerc.cn/api/user/bot/remove/",
                 type: "POST",
                 data:{
                     bot_id: bot.id,
@@ -225,7 +225,7 @@ export default {
         const update_bot = (bot) => {
             botadd.error_message = "";
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/user/bot/update/",
+                url: "https://rotaerc.cn/api/user/bot/update/",
                 type: "POST",
                 data:{
                     bot_id: bot.id,

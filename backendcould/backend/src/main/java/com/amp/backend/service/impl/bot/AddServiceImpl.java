@@ -6,11 +6,15 @@ import com.amp.backend.pojo.User;
 import com.amp.backend.service.impl.utils.UserDetailsImpl;
 import com.amp.backend.service.user.bot.AddService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,8 +57,11 @@ public class AddServiceImpl implements AddService {
         }
 
         if (content == null || content.length() == 0) {
-            map.put("error_message", "代码不能为空");
-            return map;
+            try {
+                content = FileUtils.readFileToString(new File("/home/gyp/Bot.txt"), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (content.length() > 10000) {

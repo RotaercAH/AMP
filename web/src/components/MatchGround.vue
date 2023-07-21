@@ -19,6 +19,13 @@
                     </option>
                     </select>
                 </div>
+                <div class="operation_instruction">
+                    操作说明：W S A D 分别对应上 下 左 右
+                </div>
+                <div class="pk_instruction">
+                    对局说明：可选择亲自操作或创建Bot(AI)由Bot出战
+                </div>
+                
             </div>
             <div class="col-4">
                 <div class="user-photo">
@@ -66,7 +73,7 @@ export default {
 
         const refresh_bots = () => {
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/user/bot/getlist/",
+                url: "https://rotaerc.cn/api/user/bot/getlist/",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + store.state.user.token,
@@ -121,5 +128,21 @@ div.user-select-bot {
 div.user-select-bot > select {
     width: 75%;
     margin: 0 auto;
+}
+
+div.operation_instruction{
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    color: rgb(255, 244, 209);
+    padding-top: 6vh;
+}
+
+div.pk_instruction{
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    color: rgb(255, 244, 209);
+    padding-top: 2vh;
 }
 </style>

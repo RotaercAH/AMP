@@ -90,7 +90,7 @@ export default {
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: "https://app5706.acapp.acwing.com.cn/api/record/getlist/",
+                url: "https://rotaerc.cn/api/record/getlist/",
                 data: {
                     page,
                 },
